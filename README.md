@@ -21,7 +21,7 @@ project-root/
 - Install required packages listed in requirements.txt
 ### Installation
 ``` 
-git clone **need to change**
+git clone https://github.com/ChicIceCream/Abstraction-Layer-for-LLMs.git
 cd your-repo-directory
 ```
 Install dependencies using pip:
