@@ -15,7 +15,6 @@ from nlp_tasks import (
     code_generation_task,
     document_qa_task
 )
-
 #* Logging Setup
 
 logging.basicConfig(
