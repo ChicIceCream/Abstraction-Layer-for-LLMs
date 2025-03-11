@@ -4,39 +4,47 @@ import re
 from io import BytesIO
 from PyPDF2 import PdfReader
 import streamlit as st
+from langchain_core.documents import Document
 
 #* Existing document processing caching function
+
 @st.cache_data(show_spinner=False)
 def cached_process_documents(file_data):
     logging.info("Processing documents via cache.")
-    full_text = ""
+    documents = []
     for name, content in file_data:
         if name.endswith(".pdf"):
             try:
                 pdf_reader = PdfReader(BytesIO(content))
-                for page in pdf_reader.pages:
+                for page_num, page in enumerate(pdf_reader.pages):
                     text = page.extract_text()
                     if text:
-                        full_text += text + "\n"
+                        metadata = {"source": name, "page": page_num + 1}
+                        documents.append(Document(page_content=text, metadata=metadata))
                 logging.info(f"Processed PDF: {name}")
             except Exception as e:
                 logging.error(f"Error processing PDF {name}: {e}")
         elif name.endswith(".csv"):
             try:
                 df = pd.read_csv(BytesIO(content))
-                full_text += df.astype(str).apply(lambda x: " ".join(x), axis=1).str.cat(sep="\n") + "\n"
+                for index, row in df.iterrows():
+                    text = " ".join(row.astype(str))
+                    metadata = {"source": name, "row": index + 1}
+                    documents.append(Document(page_content=text, metadata=metadata))
                 logging.info(f"Processed CSV: {name}")
             except Exception as e:
                 logging.error(f"Error processing CSV {name}: {e}")
         elif name.endswith(".txt"):
             try:
-                full_text += content.decode("utf-8") + "\n"
+                text = content.decode("utf-8")
+                metadata = {"source": name}
+                documents.append(Document(page_content=text, metadata=metadata))
                 logging.info(f"Processed TXT: {name}")
             except Exception as e:
                 logging.error(f"Error processing TXT {name}: {e}")
         else:
             logging.warning(f"Unsupported file type: {name}")
-    return full_text
+    return documents
 
 def process_documents(files):
     file_data = []
@@ -47,6 +55,7 @@ def process_documents(files):
         except Exception as e:
             logging.error(f"Error reading file {uploaded_file.name}: {e}")
     return cached_process_documents(file_data)
+
 
 #* Additional Data Processing Functions
 

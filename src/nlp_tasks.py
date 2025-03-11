@@ -129,10 +129,18 @@ Answer:
     return chain
 
 #* Document QA task
+
+from langchain.schema import Document
+
 def document_qa_task(document_context, user_question):
+    # Ensure document_context is a string
+    if isinstance(document_context, list):
+        document_context = " ".join([doc.page_content if hasattr(doc, "page_content") else str(doc) for doc in document_context])
+        
     if document_context:
+        doc_obj = Document(page_content=document_context, metadata={})
         chain = get_conversational_chain()
-        response = chain({"input_documents": [document_context], "question": user_question}, return_only_outputs=True)
+        response = chain({"input_documents": [doc_obj], "question": user_question}, return_only_outputs=True)
         return response["output_text"]
     else:
         return "No document context available."
