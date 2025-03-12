@@ -80,5 +80,4 @@ This technical report summarizes the design choices, technical decisions, and op
 
 - **Scalability and Deployment:**  
   Future iterations might include containerization (e.g., Docker) and orchestration (e.g., Kubernetes) for production-grade deployments, along with dedicated monitoring tools.
-
 ---
